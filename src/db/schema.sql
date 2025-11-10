@@ -1,21 +1,46 @@
 CREATE TABLE IF NOT EXISTS accounts (
-    account_id SERIAL PRIMARY KEY,
-    account_name TEXT NOT NULL
+  account_id SERIAL PRIMARY KEY,
+  account_name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS categories (
-    category_name SERIAL PRIMARY KEY,
-    name TEXT NOT NULL 
+  category_id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE IF NOT EXISTS transactions(
-    transactions_id BIGSERIAL PRIMARY KEY,
-    tx_date DATE NOT NULL,
-    account_id INT REFERENCES account(account_id),
-    category_id INT REFERENCES categories(category_id),
-    amount NUMERIC(12,2) NOT NULL, 
-    currency TEXT DEFAULT 'USD',
-    descrption TEXT
-);
+INSERT INTO accounts (account_id, account_name)
+VALUES 
+(1, 'Main Account'),
+(2, 'Savings'),
+(3, 'Corporate Card'),
+(4, 'Cash');
 
-CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions (tx_date);
+INSERT INTO categories (category_id, name)
+VALUES 
+(1, 'Sales'),
+(2, 'Consulting'),
+(3, 'Investments'),
+(4, 'Other Income'),
+(5, 'Office Supplies'),
+(6, 'Rent'),
+(7, 'Marketing'),
+(8, 'Utilities'),
+(9, 'Salaries'),
+(10, 'Travel'),
+(11, 'Taxes');
+
+
+-- queries
+SELECT tx_date, SUM(amount) as total
+FROM transactions
+GROUP BY tx_date
+ORDER BY tx_date;
+
+
+SELECT c.name, SUM(t.amount) as total
+FROM transactions t
+JOIN categories c ON t.category_id = c.category_id
+WHERE t.amount < 0
+GROUP BY c.name
+ORDER BY total ASC
+LIMIT 10;
